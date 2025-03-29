@@ -21,6 +21,7 @@ env:
   ARM_USE_OIDC: true
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_ACCESS_KEY: ${{ secrets.ARM_ACCESS_KEY }}
 
 jobs:
   integration-test:
@@ -47,7 +48,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.10.5"
+          terraform_version: "1.5.0"
 
       - name: Terraform Init
         run: terraform init
@@ -98,7 +99,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     environment: production
-    needs: []
+    needs: [integration-test]
 
     defaults:
       run:
@@ -118,7 +119,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.10.5"
+          terraform_version: "1.5.0"
 
       - name: Terraform Init
         run: terraform init
