@@ -10,11 +10,13 @@ permissions:
   contents: read
   pull-requests: write
 
-#These environment variables are used by the terraform azure provider to setup OIDD authenticate. 
+#These environment variables are used by the terraform azure provider to setup OIDC authenticate. 
 env:
   ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
   ARM_SUBSCRIPTION_ID: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
   ARM_TENANT_ID: "${{ secrets.AZURE_TENANT_ID }}"
+  ARM_USE_OIDC: true
+  ARM_OIDC_TOKEN: "${{ steps.azure-login.outputs.access_token }}"
   ARM_ACCESS_KEY: "${{ secrets.ARM_ACCESS_KEY }}"
 
 defaults:
@@ -69,11 +71,13 @@ jobs:
 
     # Azure Login
     - name: Azure Login
+      id: azure-login
       uses: azure/login@v1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        enable-AzPSSession: false
 
     # Install the latest version of the Terraform CLI
     - name: Setup Terraform
@@ -175,11 +179,13 @@ jobs:
 
     # Azure Login
     - name: Azure Login
+      id: azure-login
       uses: azure/login@v1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        enable-AzPSSession: false
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
