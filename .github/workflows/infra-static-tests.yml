@@ -43,8 +43,10 @@ jobs:
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
-      - name: Run tflint
-        run: tflint --format=compact
+      - name: Initialize and Run TFLint
+        run: |
+          tflint --init
+          tflint --format=compact
 
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@v12
