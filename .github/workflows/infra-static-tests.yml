@@ -1,0 +1,54 @@
+name: "Terraform Static Analysis"
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'infra/tf-app/**'
+      - '.github/workflows/infra-static-tests.yml'
+
+jobs:
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./infra/tf-app
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.5"
+
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Initialize Terraform
+        id: init
+        run: terraform init -backend=false
+
+      - name: Run terraform validate
+        id: validate
+        run: terraform validate
+
+      - name: Install tflint
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+
+      - name: Run tflint
+        run: tflint --format=compact
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: infra/tf-app
+          framework: terraform
+          soft_fail: true

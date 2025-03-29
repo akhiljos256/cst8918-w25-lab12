@@ -20,7 +20,7 @@ resource "azurerm_resource_group" "rg" {
 
 # Storage Account
 resource "azurerm_storage_account" "sa" {
-  name                     = "040982662githubactions"
+  name                     = "sa040982662githubactions"
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
