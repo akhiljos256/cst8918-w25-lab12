@@ -11,6 +11,8 @@ on:
     paths:
       - 'infra/tf-app/**'
       - '.github/workflows/infra-ci-cd.yml'
+    tags:
+      - 'v*'
 
 permissions:
   id-token: write
@@ -26,7 +28,7 @@ env:
 jobs:
   integration-test:
     name: Integration Test
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
     runs-on: ubuntu-latest
     environment: production
 
@@ -96,7 +98,7 @@ jobs:
 
   deploy:
     name: Deploy
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     needs: [integration-test]
