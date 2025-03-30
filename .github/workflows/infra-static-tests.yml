@@ -2,6 +2,12 @@ name: "Terraform Static Analysis"
 
 on:
   push:
+    branches: [ main ]
+    paths:
+      - 'infra/tf-app/**'
+      - '.github/workflows/infra-static-tests.yml'
+  pull_request:
+    branches: [ main ]
     paths:
       - 'infra/tf-app/**'
       - '.github/workflows/infra-static-tests.yml'
