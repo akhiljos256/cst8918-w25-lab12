@@ -1,9 +1,9 @@
 terraform {
-  required_version = "~> 1.5.0"
+  required_version = ">= 1.1.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.117.1"
+      version = "~> 3.0"
     }
   }
   backend "azurerm" {
@@ -16,5 +16,9 @@ terraform {
 
 provider "azurerm" {
   features {}
-  use_oidc = true
+  # Use service principal authentication
+  subscription_id = var.subscription_id
+  client_id       = var.client_id
+  client_secret   = var.client_secret
+  tenant_id       = var.tenant_id
 }
