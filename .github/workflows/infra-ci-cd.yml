@@ -57,6 +57,8 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: false
+          audience: api://AzureADTokenExchange
+          subject: repo:akhiljos256/cst8918-w25-lab12:ref:refs/heads/${{ github.ref_name }}
 
       - name: Terraform Init
         run: terraform init
