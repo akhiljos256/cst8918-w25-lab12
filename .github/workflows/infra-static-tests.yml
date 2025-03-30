@@ -1,0 +1,22 @@
+name: Terraform Static Analysis
+on: [push]
+
+jobs:
+  tflint:
+    name: TFLint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: terraform-linters/setup-tflint@v4
+      with:
+        tflint_version: latest
+
+    - name: Init TFLint
+      working-directory: ./infra/tf-app
+      run: tflint --init
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run TFLint
+      working-directory: ./infra/tf-app
+      run: tflint -f compact
