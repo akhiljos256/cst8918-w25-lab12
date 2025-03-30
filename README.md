@@ -81,3 +81,58 @@ Environment Level Secret (production):
 - ✅ No infrastructure drift detected
 - 🔒 Infrastructure matches Terraform state
 - 🎯 All resources are in sync
+
+## Project Structure
+
+### 📁 Infrastructure Components
+```
+infra/
+├── tf-app/           # Main Terraform configuration
+│   ├── main.tf       # Resource definitions
+│   ├── variables.tf   # Input variables
+│   ├── outputs.tf     # Output values
+│   └── terraform.tf   # Provider and backend config
+├── tf-backend/       # Backend storage configuration
+└── tf-bootstrap/     # Initial setup resources
+```
+
+### 🔄 GitHub Actions Workflows
+
+1. **Static Tests (`infra-static-tests.yml`)**
+   - Runs on: Push to any branch
+   - Checks:
+     - Terraform format
+     - Terraform validation
+     - TFSec security scan
+
+2. **CI/CD Pipeline (`infra-ci-cd.yml`)**
+   - Integration Tests (PR to main)
+     - TFLint checks
+     - Terraform plan
+     - Plan posted to PR
+   - Deployment (Push to main)
+     - Terraform apply
+     - Infrastructure updates
+
+3. **Drift Detection (`infra-drift-detection.yml`)**
+   - Runs: Daily at midnight
+   - Checks for infrastructure drift
+   - Reports any state mismatches
+
+## 🛠️ Development Workflow
+
+1. Create feature branch from `dev`
+2. Make infrastructure changes
+3. Push changes and create PR
+4. Wait for workflow checks
+5. Get PR review and approval
+6. Merge to main for deployment
+
+## 🔐 Security Features
+
+- OIDC authentication with Azure
+- Branch protection rules
+- Environment protection rules
+- Separate service principals for read/write
+- TFSec security scanning
+- Infrastructure drift detection
