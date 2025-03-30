@@ -42,23 +42,14 @@ jobs:
         with:
           terraform_version: "~1.5"
 
-      - name: Set Environment Variables
-        run: |
-          echo "ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
-          echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-          echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
-          echo "ARM_USE_OIDC=true" >> $GITHUB_ENV
-          echo "ARM_USE_CLI=true" >> $GITHUB_ENV
-
       - name: Azure Login
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: "8a7fb27a-fe8d-4120-b11a-ebb0154ca82e"
+          tenant-id: "e39de75c-b796-4bdd-888d-f3d21250910c"
+          subscription-id: "5eb83737-e0c8-46c1-818d-4d9725820e3f"
           enable-AzPSSession: false
           audience: api://AzureADTokenExchange
-          subject: repo:akhiljos256/cst8918-w25-lab12:ref:refs/heads/${{ github.ref_name }}
 
       - name: Terraform Init
         run: terraform init
