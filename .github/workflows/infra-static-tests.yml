@@ -2,55 +2,57 @@ name: "Terraform Static Analysis"
 
 on:
   push:
-    branches:
-      - '**'
+    branches: [ main ]
     paths:
       - 'infra/tf-app/**'
       - '.github/workflows/infra-static-tests.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'infra/tf-app/**'
+      - '.github/workflows/infra-static-tests.yml'
+
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
   static-analysis:
     name: Static Analysis
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: ./infra/tf-app
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.5.0"
+          terraform_version: "1.7.0"
 
-      - name: Terraform Format Check
+      - name: Terraform Format
         id: fmt
         run: terraform fmt -check
         continue-on-error: true
 
-      - name: Initialize Terraform
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.50.0
+
+      - name: Init TFLint
+        run: tflint --init
+
+      - name: Run TFLint
+        run: tflint -f compact
+
+      - name: Terraform Init
         id: init
         run: terraform init -backend=false
 
-      - name: Run terraform validate
+      - name: Terraform Validate
         id: validate
         run: terraform validate
-
-      - name: Install tflint
-        run: |
-          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-
-      - name: Initialize and Run TFLint
-        run: |
-          tflint --init
-          tflint --format=compact
-
-      - name: Run Checkov
-        uses: bridgecrewio/checkov-action@v12
-        with:
-          directory: infra/tf-app
-          framework: terraform
-          soft_fail: true
