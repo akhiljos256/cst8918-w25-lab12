@@ -4,18 +4,15 @@ on:
     branches: [ main ]
   pull_request:
 
-#Special permissions required for OIDC authentication
 permissions:
-  id-token: write
   contents: read
   pull-requests: write
 
-#These environment variables are used by the terraform azure provider to setup OIDC authenticate. 
 env:
   ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
+  ARM_CLIENT_SECRET: "${{ secrets.AZURE_CLIENT_SECRET }}"
   ARM_SUBSCRIPTION_ID: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
   ARM_TENANT_ID: "${{ secrets.AZURE_TENANT_ID }}"
-  ARM_USE_OIDC: true
   ARM_ACCESS_KEY: "${{ secrets.ARM_ACCESS_KEY }}"
 
 defaults:
@@ -91,7 +88,12 @@ jobs:
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       working-directory: ./infra/tf-app
-      run: terraform init
+      run: |
+        terraform init \
+        -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+        -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+        -var="client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
+        -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}"
 
     # Checks that all Terraform configuration files adhere to a canonical format
     # Will fail the build if not
@@ -106,7 +108,11 @@ jobs:
       working-directory: ./infra/tf-app
       run: |
         export exitcode=0
-        terraform plan -detailed-exitcode -no-color -out tfplan || export exitcode=$?
+        terraform plan -detailed-exitcode -no-color -out tfplan \
+          -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+          -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+          -var="client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
+          -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" || export exitcode=$?
 
         echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
         
@@ -183,18 +189,7 @@ jobs:
     - name: Azure Login
       uses: azure/login@v1
       with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        enable-AzPSSession: false
-
-    # Configure Azure credentials
-    - name: Configure Azure credentials
-      run: |
-        echo "ARM_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
-        echo "ARM_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-        echo "ARM_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
-        echo "ARM_USE_OIDC=true" >> $GITHUB_ENV
+        creds: '{"clientId": "${{ secrets.AZURE_CLIENT_ID }}", "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}", "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}", "tenantId": "${{ secrets.AZURE_TENANT_ID }}"}'
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
@@ -205,7 +200,12 @@ jobs:
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       working-directory: ./infra/tf-app
-      run: terraform init
+      run: |
+        terraform init \
+        -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+        -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+        -var="client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
+        -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}"
 
     # Download saved plan from artifacts  
     - name: Download Terraform Plan
@@ -217,4 +217,9 @@ jobs:
     # Terraform Apply
     - name: Terraform Apply
       working-directory: ./infra/tf-app
-      run: terraform apply -auto-approve tfplan
+      run: |
+        terraform apply -auto-approve tfplan \
+        -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+        -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+        -var="client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
+        -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}"
