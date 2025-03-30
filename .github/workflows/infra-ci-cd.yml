@@ -25,6 +25,29 @@ defaults:
     working-directory: ./infra/tf-app
 
 jobs:
+  tflint:
+    name: TFLint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./infra/tf-app
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.50.0
+
+      - name: Initialize TFLint
+        run: tflint --init
+
+      - name: Run TFLint
+        run: tflint -f compact
+
   static:
     name: Static Analysis
     runs-on: ubuntu-latest
@@ -134,7 +157,7 @@ jobs:
             })
 
   apply:
-    needs: [plan, static]
+    needs: [plan, static, tflint]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     name: Terraform Apply
