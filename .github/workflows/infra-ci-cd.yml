@@ -27,7 +27,9 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     name: Terraform Plan
-    environment: production
+    environment:
+      name: production
+      url: ${{ github.server_url }}/${{ github.repository }}/deployments
     defaults:
       run:
         working-directory: ./infra/tf-app
@@ -116,7 +118,9 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     name: Terraform Apply
-    environment: production
+    environment:
+      name: production
+      url: ${{ github.server_url }}/${{ github.repository }}/deployments
 
     steps:
       - name: Checkout
