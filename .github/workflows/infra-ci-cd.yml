@@ -70,7 +70,7 @@ jobs:
             -var="client_secret=${{ secrets.ARM_CLIENT_SECRET }}" \
             -var="subscription_id=$ARM_SUBSCRIPTION_ID" \
             -var="tenant_id=$ARM_TENANT_ID" \
-            -detailed-exitcode -no-color -out tfplan || export exitcode=$?
+            -detailed-exitcode -no-color -out=plan.tfplan || export exitcode=$?
 
           echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
           if [ $exitcode -eq 1 ]; then
@@ -83,8 +83,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: tfplan
-          retention-days: 1
+          path: plan.tfplan
+          if-no-files-found: error
 
       - name: Create String Output
         id: tf-plan-string
@@ -169,4 +169,4 @@ jobs:
             -var="client_secret=${{ secrets.ARM_CLIENT_SECRET }}" \
             -var="subscription_id=$ARM_SUBSCRIPTION_ID" \
             -var="tenant_id=$ARM_TENANT_ID" \
-            -auto-approve tfplan
+            -auto-approve plan.tfplan
