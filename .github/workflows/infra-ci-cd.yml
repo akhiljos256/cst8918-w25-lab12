@@ -120,7 +120,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: tfplan
-        path: tfplan
+        path: ./infra/tf-app/tfplan
         
     # Create string output of Terraform Plan
     - name: Create String Output
@@ -203,6 +203,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: tfplan
+        path: ./infra/tf-app
 
     # Terraform Apply
     - name: Terraform Apply
