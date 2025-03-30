@@ -46,6 +46,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: false
           audience: api://AzureADTokenExchange
+          allow-no-subscriptions: true
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
