@@ -17,6 +17,7 @@ env:
   ARM_SUBSCRIPTION_ID: "5eb83737-e0c8-46c1-818d-4d9725820e3f"
   ARM_TENANT_ID: "e39de75c-b796-4bdd-888d-f3d21250910c"
   ARM_ACCESS_KEY: "${{ secrets.ARM_ACCESS_KEY }}"
+  ARM_CLIENT_SECRET: "${{ secrets.ARM_CLIENT_SECRET }}"
 
 defaults:
   run:
@@ -62,7 +63,12 @@ jobs:
         id: tf-plan
         run: |
           export exitcode=0
-          terraform plan -detailed-exitcode -no-color -out tfplan || export exitcode=$?
+          terraform plan \
+            -var="client_id=$ARM_CLIENT_ID" \
+            -var="client_secret=${{ secrets.ARM_CLIENT_SECRET }}" \
+            -var="subscription_id=$ARM_SUBSCRIPTION_ID" \
+            -var="tenant_id=$ARM_TENANT_ID" \
+            -detailed-exitcode -no-color -out tfplan || export exitcode=$?
 
           echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
           if [ $exitcode -eq 1 ]; then
@@ -150,4 +156,10 @@ jobs:
           path: ./infra/tf-app/tfplan
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+        run: |
+          terraform apply \
+            -var="client_id=$ARM_CLIENT_ID" \
+            -var="client_secret=${{ secrets.ARM_CLIENT_SECRET }}" \
+            -var="subscription_id=$ARM_SUBSCRIPTION_ID" \
+            -var="tenant_id=$ARM_TENANT_ID" \
+            -auto-approve tfplan
