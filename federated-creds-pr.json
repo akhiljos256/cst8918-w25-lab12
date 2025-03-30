@@ -1,0 +1,7 @@
+{
+  "name": "github-actions-oidc-pr",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:akhiljos256/cst8918-w25-lab12:pull_request",
+  "description": "GitHub Actions OIDC for pull requests",
+  "audiences": ["api://AzureADTokenExchange"]
+}
