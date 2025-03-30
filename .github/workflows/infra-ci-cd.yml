@@ -50,6 +50,7 @@ jobs:
           subscription-id: "5eb83737-e0c8-46c1-818d-4d9725820e3f"
           enable-AzPSSession: false
           audience: api://AzureADTokenExchange
+          subject: repo:akhiljos256/cst8918-w25-lab12:ref:refs/heads/${{ github.ref_name }}
 
       - name: Terraform Init
         run: terraform init
@@ -144,6 +145,7 @@ jobs:
           subscription-id: "5eb83737-e0c8-46c1-818d-4d9725820e3f"
           enable-AzPSSession: false
           audience: api://AzureADTokenExchange
+          subject: repo:akhiljos256/cst8918-w25-lab12:ref:refs/heads/${{ github.ref_name }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -224,6 +226,7 @@ jobs:
           subscription-id: "5eb83737-e0c8-46c1-818d-4d9725820e3f"
           enable-AzPSSession: false
           audience: api://AzureADTokenExchange
+          subject: repo:akhiljos256/cst8918-w25-lab12:ref:refs/heads/${{ github.ref_name }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
