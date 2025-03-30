@@ -13,9 +13,9 @@ permissions:
 
 env:
   ARM_USE_OIDC: true
-  ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
-  ARM_SUBSCRIPTION_ID: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-  ARM_TENANT_ID: "${{ secrets.AZURE_TENANT_ID }}"
+  ARM_CLIENT_ID: "8a7fb27a-fe8d-4120-b11a-ebb0154ca82e"
+  ARM_SUBSCRIPTION_ID: "5eb83737-e0c8-46c1-818d-4d9725820e3f"
+  ARM_TENANT_ID: "e39de75c-b796-4bdd-888d-f3d21250910c"
   ARM_ACCESS_KEY: "${{ secrets.ARM_ACCESS_KEY }}"
 
 defaults:
@@ -41,8 +41,8 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          client-id: "8a7fb27a-fe8d-4120-b11a-ebb0154ca82e"
+          tenant-id: "e39de75c-b796-4bdd-888d-f3d21250910c"
           subscription-id: "5eb83737-e0c8-46c1-818d-4d9725820e3f"
           enable-AzPSSession: false
           audience: api://AzureADTokenExchange
@@ -129,8 +129,8 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          client-id: "8a7fb27a-fe8d-4120-b11a-ebb0154ca82e"
+          tenant-id: "e39de75c-b796-4bdd-888d-f3d21250910c"
           subscription-id: "5eb83737-e0c8-46c1-818d-4d9725820e3f"
           enable-AzPSSession: false
           audience: api://AzureADTokenExchange
