@@ -21,7 +21,8 @@ env:
 
 defaults:
   run:
-    working-directory: ./infra/tf-app  
+    shell: bash
+    working-directory: ./infra/tf-app
 
 jobs:
   plan:
@@ -32,6 +33,7 @@ jobs:
       url: ${{ github.server_url }}/${{ github.repository }}/deployments
     defaults:
       run:
+        shell: bash
         working-directory: ./infra/tf-app
 
     steps:
@@ -77,10 +79,12 @@ jobs:
           fi
 
       - name: Publish Terraform Plan Artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: ./infra/tf-app/tfplan
+          path: tfplan
+          retention-days: 1
 
       - name: Create String Output
         id: tf-plan-string
@@ -153,7 +157,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: ./infra/tf-app/tfplan
+          path: .
+
+      - name: List Files
+        run: ls -la
 
       - name: Terraform Apply
         run: |
