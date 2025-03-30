@@ -25,6 +25,32 @@ defaults:
     working-directory: ./infra/tf-app
 
 jobs:
+  static:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./infra/tf-app
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.5"
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
   plan:
     runs-on: ubuntu-latest
     name: Terraform Plan
@@ -108,7 +134,7 @@ jobs:
             })
 
   apply:
-    needs: plan
+    needs: [plan, static]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     name: Terraform Apply
