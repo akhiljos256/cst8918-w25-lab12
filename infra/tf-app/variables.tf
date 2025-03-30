@@ -6,5 +6,6 @@ variable "tags" {
     environment = "production"
     project     = "cst8918-lab12"
     owner       = "akhiljos256"
+    created_at  = "2025-03-29"
   }
 }
