@@ -25,6 +25,54 @@ defaults:
     working-directory: ./infra/tf-app
 
 jobs:
+  drift:
+    name: Drift Detection
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./infra/tf-app
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.5"
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: false
+          audience: api://AzureADTokenExchange
+          allow-no-subscriptions: true
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Check for Drift
+        id: drift
+        run: |
+          terraform plan -detailed-exitcode \
+            -var="client_id=$ARM_CLIENT_ID" \
+            -var="client_secret=${{ secrets.ARM_CLIENT_SECRET }}" \
+            -var="subscription_id=$ARM_SUBSCRIPTION_ID" \
+            -var="tenant_id=$ARM_TENANT_ID" \
+            -no-color || export exitcode=$?
+
+          if [ $exitcode -eq 2 ]; then
+            echo "::warning::Infrastructure drift detected!"
+            echo "drift_detected=true" >> $GITHUB_OUTPUT
+          else
+            echo "No drift detected"
+            echo "drift_detected=false" >> $GITHUB_OUTPUT
+          fi
+
   tflint:
     name: TFLint
     runs-on: ubuntu-latest
@@ -157,7 +205,7 @@ jobs:
             })
 
   apply:
-    needs: [plan, static, tflint]
+    needs: [plan, static, tflint, drift]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     name: Terraform Apply
