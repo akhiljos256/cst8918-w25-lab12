@@ -3,14 +3,8 @@ name: "Terraform CI/CD"
 on:
   pull_request:
     branches: [ "main" ]
-    paths:
-      - 'infra/tf-app/**'
-      - '.github/workflows/infra-ci-cd.yml'
   push:
     branches: [ "main" ]
-    paths:
-      - 'infra/tf-app/**'
-      - '.github/workflows/infra-ci-cd.yml'
 
 permissions:
   id-token: write
@@ -57,11 +51,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform Init
-        run: terraform init \
-          -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-          -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-          -var="client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
-          -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}"
+        run: terraform init
 
       - name: Terraform Format
         run: terraform fmt -check
@@ -70,11 +60,7 @@ jobs:
         id: tf-plan
         run: |
           export exitcode=0
-          terraform plan -detailed-exitcode -no-color -out tfplan \
-            -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-            -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-            -var="client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
-            -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}" || export exitcode=$?
+          terraform plan -detailed-exitcode -no-color -out tfplan || export exitcode=$?
 
           echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
           if [ $exitcode -eq 1 ]; then
@@ -130,7 +116,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Terraform Apply
     environment: production
-    needs: [plan]
 
     steps:
       - name: Checkout
@@ -149,11 +134,7 @@ jobs:
           terraform_version: "1.7.0"
 
       - name: Terraform Init
-        run: terraform init \
-          -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-          -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-          -var="client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
-          -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}"
+        run: terraform init
 
       - name: Download Terraform Plan
         uses: actions/download-artifact@v4
@@ -162,8 +143,4 @@ jobs:
           path: ./infra/tf-app
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan \
-          -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-          -var="client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-          -var="client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" \
-          -var="tenant_id=${{ secrets.AZURE_TENANT_ID }}"
+        run: terraform apply -auto-approve tfplan
